@@ -1,0 +1,129 @@
+/* 
+ * Apple Glass Design System for Floor-in CRM
+ * High-depth Glassmorphism, Navy Blue Dark Mode
+ */
+
+:root {
+    --brand-navy: #050a15;
+    --brand-navy-accent: #0f172a;
+    --brand-cyan: #0ea5e9;
+    --brand-blue: #1d4ed8;
+    
+    --glass-fill: rgba(15, 23, 42, 0.4);
+    --glass-fill-hover: rgba(15, 23, 42, 0.6);
+    --glass-stroke: rgba(255, 255, 255, 0.08);
+    --glass-inner-stroke: rgba(255, 255, 255, 0.1);
+    --glass-blur: blur(40px);
+    
+    --shadow-diffused: 0 20px 40px rgba(0, 0, 0, 0.4);
+    --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --text-muted: rgba(255, 255, 255, 0.45);
+    
+    --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+body {
+    font-family: var(--font-main);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Glass Card Component */
+.glass-card {
+    background: var(--glass-fill);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-stroke);
+    border-radius: 24px;
+    padding: 28px;
+    position: relative;
+    box-shadow: var(--shadow-diffused);
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    overflow: hidden;
+}
+
+/* The Glossy Inner Stroke (Simulated with pseudo-element) */
+.glass-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 24px;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent 50%, rgba(255,255,255,0.05));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
+    -webkit-mask-composite: destination-out;
+    pointer-events: none;
+}
+
+.glass-card:hover {
+    background: var(--glass-fill-hover);
+    transform: translateY(-4px);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Primary Action Buttons (Glow) */
+.btn-primary {
+    background: linear-gradient(135deg, var(--brand-blue), var(--brand-cyan));
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    padding: 12px 24px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(29, 78, 216, 0.4);
+    transition: all 0.3s;
+    position: relative;
+}
+
+.btn-primary:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
+}
+
+/* Recessed Input Styles */
+.form-control-recessed {
+    background: rgba(0, 0, 0, 0.25) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    box-shadow: var(--shadow-inner) !important;
+    border-radius: 12px !important;
+    color: var(--text-primary) !important;
+    padding: 14px 18px !important;
+    transition: all 0.2s;
+}
+
+.form-control-recessed:focus {
+    background: rgba(0, 0, 0, 0.35) !important;
+    border-color: var(--brand-cyan) !important;
+    outline: none;
+}
+
+/* Mesh Gradient Background Shell */
+.bg-mesh-container {
+    background-color: var(--brand-navy);
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(29, 78, 216, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(14, 165, 233, 0.1) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(29, 78, 216, 0.15) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, rgba(14, 165, 233, 0.1) 0px, transparent 50%);
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+}
+
+/* Typographic Overrides */
+h1, h2, h3, h4, .text-glow {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    letter-spacing: -0.02em;
+}
+
+.text-secondary {
+    color: var(--text-secondary);
+}
+
+.text-muted {
+    color: var(--text-muted);
+}

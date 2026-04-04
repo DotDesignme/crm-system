@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# 🚀 Deployment Script Example for CRM System
+# Rename this file to 'auto_deploy.sh' and update the variables below.
+
+echo "🚀 Starting Automated Deployment to [YOUR_SERVER_IP]..."
+
+# Check for deploy zip
+if [ ! -f "lead_system_deploy.zip" ]; then
+    echo "❌ Error: lead_system_deploy.zip not found! Run build_and_zip.sh first."
+    exit 1
+fi
+
+# Uploading files
+# Replace [YOUR_SERVER_IP] and [YOUR_REMOTE_PATH] with your actual data.
+expect -c '
+set timeout -1
+spawn scp -o StrictHostKeyChecking=no lead_system_deploy.zip server_deploy.sh root@[YOUR_SERVER_IP]:[YOUR_REMOTE_PATH]/
+expect "*?assword:*"
+send "[YOUR_PASSWORD]\r"
+expect eof
+'
+
+echo "⚙️ Executing deployment script on the remote server..."
+expect -c '
+set timeout -1
+spawn ssh -o StrictHostKeyChecking=no root@[YOUR_SERVER_IP] "cd [YOUR_REMOTE_PATH] && unzip -o -q lead_system_deploy.zip && chmod +x server_deploy.sh && ./server_deploy.sh && rm lead_system_deploy.zip"
+expect "*?assword:*"
+send "[YOUR_PASSWORD]\r"
+expect eof
+'
+
+echo "✅ Deployment Complete! 🚀"

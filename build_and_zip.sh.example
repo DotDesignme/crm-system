@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# 📦 Build and Zip (Generic Example)
+# This script prepares the CRM for manual or automated upload.
+
+echo "🏗️ Building Frontend Assets..."
+npm install
+npm run build
+
+echo "🚮 Cleaning Local Development Artifacts..."
+rm -rf vendor
+rm -f .env
+rm -f database/database.sqlite
+
+echo "📦 Zipping project..."
+zip -r lead_system_deploy.zip . -x "*.git*" "node_modules/*" ".DS_Store"
+
+echo "✅ Package created: lead_system_deploy.zip"

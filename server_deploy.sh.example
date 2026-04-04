@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# 🚀 Server-Side Deployment Process (Example)
+# This script runs on the remote server to install dependencies and clear cache.
+
+PHP_BIN="/usr/bin/php8.3" # Update to your server PHP path
+COMPOSER_BIN="/usr/bin/composer"
+
+echo "📦 Installing/Updating Dependencies..."
+$PHP_BIN $COMPOSER_BIN install --optimize-autoloader --no-dev
+
+echo "🗄️ Running Database Migrations..."
+$PHP_BIN artisan migrate --force
+
+echo "🧹 Clearing and Caching (Config, Routes, Views)..."
+$PHP_BIN artisan config:clear
+$PHP_BIN artisan route:clear
+$PHP_BIN artisan view:clear
+
+echo "🔐 Setting Directory Permissions..."
+# Adjust ownership as per your web server user (e.g. www, nginx)
+chown -R www-data:www-data .
+chmod -R 775 storage bootstrap/cache
+
+echo "🎉 Deployment Completed!"
