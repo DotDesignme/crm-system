@@ -65,6 +65,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/communications', [CommunicationController::class, 'store'])->name('communications.store');
     Route::post('/communications/whatsapp/log', [CommunicationController::class, 'logWhatsAppStore'])->name('communications.whatsapp.log');
     Route::post('/notes', [NoteController::class, 'store'])->name('notes.store');
+    Route::delete('/notes/{note}', [NoteController::class, 'destroy'])->name('notes.destroy');
 
     // Services (formerly Products)
     Route::resource('services', ServiceController::class)->except(['create','show','edit'])->middleware('permission:view-services');
@@ -138,6 +139,12 @@ Route::middleware('auth')->group(function () {
 
         // Executive Dashboard
         Route::get('/executive-dashboard', [AdminExecutiveController::class, 'index'])->name('admin.executive');
+
+        // Plugin Management
+        Route::get('/settings/plugins', [\App\Http\Controllers\PluginController::class, 'index'])->name('settings.plugins');
+        Route::post('/settings/plugins/toggle/{plugin}', [\App\Http\Controllers\PluginController::class, 'toggle'])->name('settings.plugins.toggle');
+        Route::post('/settings/plugins/upload', [\App\Http\Controllers\PluginController::class, 'upload'])->name('settings.plugins.upload');
+        Route::delete('/settings/plugins/delete/{plugin}', [\App\Http\Controllers\PluginController::class, 'delete'])->name('settings.plugins.delete');
     });
 
     // Employee Profile & Command Center (Accessible to ALL authenticated employees)

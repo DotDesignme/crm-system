@@ -262,6 +262,7 @@
                 <button class="btn btn-ghost btn-sm" style="justify-content: center; height: 44px; grid-column: span 2; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 12px;" onclick="openLogModal('email')">
                     <i class="fas fa-envelope" style="margin-{{ app()->getLocale() == 'ar' ? 'left' : 'right' }}: 8px; color: var(--warning);"></i> {{ __('messages.log_email') }}
                 </button>
+                @stack('plugin-lead-actions')
             </div>
         </div>
     </div>

@@ -65,7 +65,7 @@ class CustomerController extends Controller
             abort(403);
         }
 
-        $customer->load(['contacts', 'deals.stage', 'leads', 'contracts', 'assignedEmployee']);
+        $customer->load(['contacts', 'deals.stage', 'leads', 'contracts', 'assignedEmployee', 'notes_list.employee']);
         
         $directActivities = \App\Models\Activity::where('activitiable_id', $customer->id)
             ->where('activitiable_type', Customer::class)
@@ -77,7 +77,10 @@ class CustomerController extends Controller
             ->sortByDesc('created_at')
             ->take(20);
             
-        return view('customers.show', compact('customer', 'activities'));
+        $stages = \App\Models\DealStage::where('company_id', $user->company_id)->orderBy('order')->get();
+        $templates = \App\Models\TaskTemplate::where('company_id', $user->company_id)->get();
+            
+        return view('customers.show', compact('customer', 'activities', 'stages', 'templates'));
     }
 
     public function update(Request $r, Customer $customer)

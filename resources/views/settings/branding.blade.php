@@ -35,7 +35,8 @@
                         ['id'=>'financials', 'icon'=>'fas fa-wallet', 'label'=>__('messages.financial_settings')],
                         ['id'=>'pipeline', 'icon'=>'fas fa-stream', 'label'=>__('messages.sales_pipeline')],
                         ['id'=>'loss_reasons', 'icon'=>'fas fa-times-circle', 'label'=>__('messages.loss_reasons')],
-                        ['id'=>'health_score', 'icon'=>'fas fa-heartbeat', 'label'=>__('messages.health_score_rules')]
+                        ['id'=>'health_score', 'icon'=>'fas fa-heartbeat', 'label'=>__('messages.health_score_rules')],
+                        ['id'=>'plugins', 'icon'=>'fas fa-plug', 'label'=>__('Plugins & Modules')]
                     ];
                 @endphp
                 @foreach($tabs as $t)
@@ -73,8 +74,28 @@
                                 <input type="text" name="app_name" class="gm-input" value="{{ (is_array($settings) || $settings instanceof \Illuminate\Support\Collection) ? ($settings['app_name'] ?? config('app.name')) : config('app.name') }}" required placeholder="e.g. Growth OS">
                             </div>
                             <div class="mb-4">
-                                <label class="gm-label">{{ __('messages.system_icon') }} (FontAwesome)</label>
+                                <label class="gm-label">Brand Slogan (Login Page)</label>
+                                <input type="text" name="system_slogan" class="gm-input" value="{{ $settings['system_slogan'] ?? 'Elevate Your Business Workflow with Next-Generation Intelligence and Seamless Management.' }}" placeholder="e.g. The Smarter Way to Manage Leads">
+                            </div>
+                            <div class="mb-4">
+                                <label class="gm-label">{{ __('messages.system_icon') ?? 'System Icon' }} (FontAwesome)</label>
                                 <input type="text" name="system_icon" class="gm-input" value="{{ $settings['system_icon'] ?? 'fas fa-layer-group' }}" placeholder="e.g. fas fa-rocket">
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <label class="gm-label">Primary Color</label>
+                                    <div style="display:flex; gap:10px;">
+                                        <input type="color" name="primary_color" value="{{ $settings['primary_color'] ?? '#1d4ed8' }}" style="width:44px; height:44px; padding:0; border:none; background:none; cursor:pointer; border-radius:8px;">
+                                        <input type="text" value="{{ $settings['primary_color'] ?? '#1d4ed8' }}" class="gm-input" style="flex:1;" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <label class="gm-label">Accent Color</label>
+                                    <div style="display:flex; gap:10px;">
+                                        <input type="color" name="accent_color" value="{{ $settings['accent_color'] ?? '#0ea5e9' }}" style="width:44px; height:44px; padding:0; border:none; background:none; cursor:pointer; border-radius:8px;">
+                                        <input type="text" value="{{ $settings['accent_color'] ?? '#0ea5e9' }}" class="gm-input" style="flex:1;" readonly>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -382,11 +403,99 @@
             </div>
         </div>
         @endif
+        
+        {{-- PLUGINS TAB --}}
+        @if($activeTab == 'plugins')
+        <div class="g-panel">
+            <div style="padding:20px; border-bottom:1px solid rgba(255,255,255,.05); display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <i class="fas fa-plug" style="color:#a855f7; font-size:18px;"></i>
+                    <h3 style="margin:0; font-size:16px; font-weight:800; color:#fff;">{{ __('Plugins & Modules') }}</h3>
+                </div>
+                <button type="button" class="filter-btn filter-btn-primary" onclick="document.getElementById('uploadPluginModal').classList.add('show')">
+                    <i class="fas fa-upload"></i> {{ __('Upload Plugin (.zip)') }}
+                </button>
+            </div>
+            <div style="padding:20px;">
+                @if(session('error'))
+                    <div class="alert badge-urgent mb-4" style="width:100%; padding:15px;">{{ session('error') }}</div>
+                @endif
+                <div class="row g-4">
+                    @forelse($plugins ?? [] as $plugin)
+                        <div class="col-md-6">
+                            <div class="glass-card" style="padding:20px; border:1px solid {{ $plugin->is_active ? 'rgba(168,85,247,0.3)' : 'rgba(255,255,255,0.05)' }}; transform:none !important;">
+                                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+                                    <div style="flex:1;">
+                                        <h4 style="margin:0; font-size:16px; color:#fff;">{{ $plugin->name }} <span style="font-size:11px; opacity:0.5;">v{{ $plugin->version }}</span></h4>
+                                        <p style="font-size:12px; color:var(--text-muted); margin:4px 0 0; line-height:1.4;">{{ $plugin->description }}</p>
+                                    </div>
+                                    <div style="margin-left:15px;">
+                                        <form action="{{ route('settings.plugins.toggle', $plugin) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" style="background:none; border:none; cursor:pointer; color:{{ $plugin->is_active ? '#a855f7' : 'var(--text-muted)' }}; font-size:28px; transition:0.3s; padding:0;">
+                                                <i class="fas fa-toggle-{{ $plugin->is_active ? 'on' : 'off' }}"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.05);">
+                                    <span class="badge {{ $plugin->is_active ? 'badge-interested' : 'badge-low' }}" style="font-size:10px;">
+                                        {{ $plugin->is_active ? 'ACTIVE' : 'INACTIVE' }}
+                                    </span>
+                                    <form action="{{ route('settings.plugins.delete', $plugin) }}" method="POST" onsubmit="return confirm('Delete this plugin and all its files?')">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" style="background:none; border:none; color:#ef4444; font-size:12px; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:6px;">
+                                            <i class="fas fa-trash-alt"></i> Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="col-12">
+                            <div style="text-align:center; padding:60px 20px; background:rgba(255,255,255,0.02); border-radius:20px; border:1px dashed rgba(255,255,255,0.1);">
+                                <i class="fas fa-puzzle-piece" style="font-size:48px; color:var(--text-muted); margin-bottom:16px; opacity:0.3;"></i>
+                                <h4 style="color:var(--text-muted); margin-bottom:8px;">No Plugins Installed</h4>
+                                <p style="font-size:14px; color:var(--text-muted);">Expand your CRM by uploading a new module.</p>
+                            </div>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+        @endif
 
     </div>
 </div>
 
 @include('settings.partials.modals')
+
+{{-- UPLOAD PLUGIN MODAL --}}
+<div id="uploadPluginModal" class="modal-overlay gm-overlay">
+    <div class="glass-card" style="width:100%; max-width:450px; padding:30px; position:relative;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+            <h3 style="margin:0; font-size:18px; color:#fff;"><i class="fas fa-upload" style="color:var(--primary-light);"></i> Upload New Plugin</h3>
+            <button type="button" class="btn-logout" onclick="closeModal('uploadPluginModal')" style="padding:5px;"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <form action="{{ route('settings.plugins.upload') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="mb-4">
+                <label class="gm-label">Plugin File (.zip)</label>
+                <div style="background:rgba(0,0,0,0.2); border:2px dashed rgba(255,255,255,0.1); border-radius:12px; padding:30px; text-align:center; position:relative; transition:0.3s;" onmouseover="this.style.borderColor='var(--primary-light)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
+                    <i class="fas fa-file-archive" style="font-size:32px; color:var(--text-muted); margin-bottom:12px;"></i>
+                    <p style="font-size:13px; color:var(--text-muted); margin:0;">Drag and drop or click to select</p>
+                    <input type="file" name="plugin_zip" accept=".zip" required style="position:absolute; inset:0; opacity:0; cursor:pointer;">
+                </div>
+            </div>
+            
+            <div style="display:flex; gap:12px; margin-top:30px;">
+                <button type="button" class="btn btn-ghost" style="flex:1;" onclick="closeModal('uploadPluginModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary" style="flex:1;">Upload & Register</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 @endsection
 

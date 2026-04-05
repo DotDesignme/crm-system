@@ -9,8 +9,7 @@ A professional, fast, and feature-rich CRM system built with Laravel 13, featuri
 * **Duplicate Prevention:** Intelligent checks to ensure lead data remains clean and unique.
 * **Deal Pipeline:** Integrated sales tracking with revenue forecasting.
 * **Role-Based Access Control (RBAC):** Precise permissions for employees and departments.
-* **Dynamic Branding:** Full control over logo, favicon, and system colors from the admin panel.
-* **Full Arabic Support:** Native RTL support and deep localization for the Middle East market.
+* **Dual Branding:** Full control over logo, favicon, and system colors from the admin panel.
 
 ## 🛠️ Technical Stack
 

@@ -1,0 +1,7 @@
+{
+    "name": "WhatsApp Connect Pro",
+    "slug": "whatsapp-pro",
+    "version": "1.0.0",
+    "description": "Powerful WhatsApp integration that adds professional messaging buttons directly to lead and customer profiles.",
+    "provider_class": "Plugins\\WhatsAppPro\\src\\WhatsAppServiceProvider"
+}

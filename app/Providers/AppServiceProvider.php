@@ -22,7 +22,6 @@ class AppServiceProvider extends ServiceProvider
                 {
                     $result = parent::get($key, $replace, $locale, $fallback);
                     
-                    // If translation is completely missing, format it nicely instead of showing 'messages.key_name'
                     if (is_string($result) && $result === $key && str_starts_with($key, 'messages.')) {
                         $cleanKey = str_replace('messages.', '', $key);
                         return ucwords(str_replace('_', ' ', $cleanKey));
@@ -36,6 +35,20 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Dynamic Plugin Registration
+        if (!app()->runningInConsole() && \Illuminate\Support\Facades\Schema::hasTable('plugins')) {
+            try {
+                $activePlugins = \App\Models\Plugin::where('is_active', true)->get();
+                foreach ($activePlugins as $plugin) {
+                    if (class_exists($plugin->provider_class)) {
+                        $this->app->register($plugin->provider_class);
+                    }
+                }
+            } catch (\Exception $e) {
+                // Fail silently to avoid breaking the core
+            }
+        }
+
         Paginator::defaultView('vendor.pagination.custom');
 
         // Activity Monitoring Observers
@@ -61,9 +74,12 @@ class AppServiceProvider extends ServiceProvider
                 
                 if (is_array($settings) || $settings instanceof \Illuminate\Support\Collection) {
                     $branding = [
-                        'system_name' => $settings['system_name'] ?? $settings['app_name'] ?? config('app.name'),
+                        'system_name' => $settings['system_name'] ?? $settings['app_name'] ?? $settings['company_name'] ?? config('app.name'),
                         'system_logo' => $settings['system_logo'] ?? $settings['logo_path'] ?? null,
                         'system_favicon' => $settings['system_favicon'] ?? $settings['favicon_path'] ?? null,
+                        'system_slogan' => $settings['system_slogan'] ?? null,
+                        'primary_color' => $settings['primary_color'] ?? '#1d4ed8',
+                        'accent_color' => $settings['accent_color'] ?? '#0ea5e9',
                         'system_icon' => $settings['system_icon'] ?? 'fas fa-layer-group',
                         'system_currency' => $settings['system_currency'] ?? 'EGP',
                         'system_currency_symbol' => $settings['system_currency_symbol'] ?? 'ج.م',

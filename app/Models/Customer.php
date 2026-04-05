@@ -33,4 +33,24 @@ class Customer extends Model
     {
         return $this->hasMany(Deal::class);
     }
+
+    public function leads(): HasMany
+    {
+        return $this->hasMany(Lead::class);
+    }
+
+    public function contracts(): HasMany
+    {
+        return $this->hasMany(Contract::class);
+    }
+
+    public function notes_list(): \Illuminate\Database\Eloquent\Relations\MorphMany 
+    { 
+        return $this->morphMany(Note::class, 'noteable'); 
+    }
+
+    public function notes_feed(): \Illuminate\Database\Eloquent\Relations\MorphMany 
+    { 
+        return $this->notes_list(); 
+    }
 }

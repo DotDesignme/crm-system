@@ -4,333 +4,335 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ __('messages.sign_in') }} | {{ $system_branding['app_name'] ?? 'Floor-in' }}</title>
-    @if(isset($system_branding['favicon_path']))
-    <link rel="icon" type="image/x-icon" href="{{ asset('storage/'.$system_branding['favicon_path']) }}">
+    <title>{{ __('messages.sign_in') ?? 'Sign In' }} | {{ $system_branding['app_name'] ?? 'OpenCRM' }}</title>
+    
+    @if(isset($system_branding['system_favicon']))
+    <link rel="icon" type="image/png" href="{{ asset('storage/'.$system_branding['system_favicon']) }}">
     @else
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     @endif
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    @php
+        $primaryColor = $system_branding['primary_color'] ?? '#1d4ed8';
+        $accentColor = $system_branding['accent_color'] ?? '#0ea5e9';
+    @endphp
+
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-light: #818cf8;
-            --primary-dark: #4f46e5;
-            --accent: #06b6d4;
-            --bg-primary: #0a0a1a;
-            --glass-bg: rgba(255, 255, 255, 0.06);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --danger: #ef4444;
-            --radius: 20px;
-            --font-ar: 'Tajawal', sans-serif;
-            --font-en: 'Inter', sans-serif;
+            --primary: {{ $primaryColor }};
+            --accent: {{ $accentColor }};
+            --bg-dark: #050a15;
+            --glass-bg: rgba(15, 23, 42, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.6);
+            --radius: 28px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
+        * { margin:0; padding:0; box-sizing: border-box; }
         body {
-            font-family: var(--font-en);
-            background: var(--bg-primary);
-            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
             min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .login-page {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- LEFT SIDE: THE BRAND HERO --- */
+        .brand-section {
+            flex: 1.2;
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            background: var(--bg-dark);
+            padding: 60px;
         }
 
-        /* Animated Background */
-        .bg-scene {
-            position: fixed;
-            inset: 0;
-            overflow: hidden;
-        }
-        .bg-scene .orb {
+        /* Animated Mesh Gradient Background */
+        .mesh-bg {
             position: absolute;
-            border-radius: 50%;
+            inset: 0;
+            z-index: 0;
+        }
+        .mesh-bg::before {
+            content: '';
+            position: absolute;
+            width: 140%;
+            height: 140%;
+            top: -20%;
+            left: -20%;
+            background: 
+                radial-gradient(circle at 20% 30%, {{ $primaryColor }}33 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, {{ $accentColor }}22 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, #1e1b4b 0%, transparent 60%);
             filter: blur(80px);
-            opacity: 0.5;
+            animation: meshRotate 20s linear infinite;
         }
-        .bg-scene .orb-1 {
-            width: 600px; height: 600px;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.3), transparent 70%);
-            top: -200px; left: -100px;
-            animation: orbFloat1 20s ease-in-out infinite;
-        }
-        .bg-scene .orb-2 {
-            width: 500px; height: 500px;
-            background: radial-gradient(circle, rgba(6, 182, 212, 0.2), transparent 70%);
-            bottom: -200px; right: -100px;
-            animation: orbFloat2 25s ease-in-out infinite;
-        }
-        .bg-scene .orb-3 {
-            width: 300px; height: 300px;
-            background: radial-gradient(circle, rgba(168, 85, 247, 0.15), transparent 70%);
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            animation: orbFloat3 15s ease-in-out infinite;
+        @keyframes meshRotate {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.1); }
+            100% { transform: rotate(360deg) scale(1); }
         }
 
-        @keyframes orbFloat1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(80px,60px) scale(1.2); } }
-        @keyframes orbFloat2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-60px,-80px) scale(1.15); } }
-        @keyframes orbFloat3 { 0%,100% { transform: translate(-50%,-50%) scale(1); } 50% { transform: translate(-50%,-50%) scale(1.4); } }
-
-        /* Login Card */
-        .login-wrapper {
+        .brand-content {
             position: relative;
             z-index: 10;
-            width: 100%;
-            max-width: 440px;
-            padding: 20px;
-        }
-        .login-card {
-            background: rgba(17, 17, 40, 0.5);
-            backdrop-filter: blur(40px);
-            -webkit-backdrop-filter: blur(40px);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius);
-            padding: 48px 40px;
-            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
+            max-width: 540px;
+            text-align: center;
         }
 
-        .login-brand {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        .login-brand .logo {
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            border-radius: 18px;
-            display: inline-flex;
+        .brand-logo-frame {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 40px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
-            color: white;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
-            animation: logoPulse 3s ease-in-out infinite;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            animation: float 6s ease-in-out infinite;
         }
-        @keyframes logoPulse {
-            0%, 100% { box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4); }
-            50% { box-shadow: 0 8px 40px rgba(99, 102, 241, 0.6); }
-        }
-        .login-brand h1 {
-            font-size: 28px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #fff, var(--primary-light));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 8px;
-        }
-        .login-brand p {
-            color: var(--text-muted);
-            font-size: 14px;
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
         }
 
-        .form-group { margin-bottom: 20px; }
+        .brand-logo-frame img {
+            max-height: 60px;
+            max-width: 60px;
+            filter: drop-shadow(0 0 10px {{ $primaryColor }}66);
+        }
+        .brand-logo-frame i {
+            font-size: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-content h1 {
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 16px;
+            background: linear-gradient(to bottom, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-content .slogan {
+            font-size: 20px;
+            color: var(--text-dim);
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        /* --- RIGHT SIDE: THE LOGIN FORM --- */
+        .form-section {
+            flex: 0.8;
+            background: #080d1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+            border-left: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 48px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), var(--accent), transparent);
+        }
+
+        .form-header { margin-bottom: 40px; }
+        .form-header h2 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+        .form-header p { color: var(--text-dim); font-size: 14px; }
+
+        .form-group { margin-bottom: 24px; position: relative; }
         .form-group label {
             display: block;
             font-size: 13px;
             font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
+            color: var(--text-dim);
+            margin-bottom: 10px;
         }
-        .input-wrapper {
-            position: relative;
-        }
-        .input-wrapper i {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 14px;
-            transition: 0.2s;
-        }
-        .input-wrapper input {
+
+        .input-control {
             width: 100%;
-            padding: 14px 16px 14px 44px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-size: 14px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            padding: 14px 18px 14px 48px;
+            color: #fff;
+            font-size: 15px;
             font-family: inherit;
-            transition: 0.2s;
+            transition: all 0.3s;
         }
-        .input-wrapper input:focus {
+        .input-control:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 0 0 4px {{ $primaryColor }}22;
         }
-        .input-wrapper input:focus + i,
-        .input-wrapper input:focus ~ i {
-            color: var(--primary-light);
+        .form-group i {
+            position: absolute;
+            left: 18px;
+            top: 42px;
+            color: var(--text-dim);
+            font-size: 16px;
+            transition: 0.3s;
         }
+        .input-control:focus + i { color: var(--primary); }
 
         .form-options {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            margin-bottom: 28px;
+            align-items: center;
+            margin-bottom: 32px;
+            font-size: 14px;
         }
-        .checkbox-wrapper {
+        .remember-me { display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--text-dim); }
+        .remember-me input { width: 18px; height: 18px; accent-color: var(--primary); }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            border-radius: 14px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
             display: flex;
             align-items: center;
-            gap: 8px;
-            cursor: pointer;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 10px 20px {{ $primaryColor }}44;
         }
-        .checkbox-wrapper input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--primary);
-            cursor: pointer;
-        }
-        .checkbox-wrapper span {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .btn-login {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 700;
-            font-family: inherit;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        .btn-login:hover {
+        .btn-submit:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 15px 30px {{ $primaryColor }}66;
+            filter: brightness(1.1);
         }
-        .btn-login:active { transform: translateY(0); }
-        .btn-login::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, transparent, rgba(255,255,255,0.1), transparent);
-            transform: translateX(-100%);
-        }
-        .btn-login:hover::after { transform: translateX(100%); transition: 0.6s; }
 
         .alert {
-            padding: 12px 16px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            padding: 14px;
             border-radius: 12px;
-            margin-bottom: 20px;
             font-size: 13px;
+            margin-bottom: 24px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        .alert-danger {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            color: #f87171;
-        }
 
-        .lang-switch {
-            text-align: center;
-            margin-top: 24px;
-        }
-        .lang-switch a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 13px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 8px;
-            transition: 0.2s;
-        }
-        .lang-switch a:hover {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-secondary);
-        }
-
-        @media (max-width: 480px) {
-            .login-card { padding: 36px 24px; }
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .brand-section { display: none; }
+            .form-section { flex: 1; background: var(--bg-dark); }
+            .form-section::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: radial-gradient(circle at 50% 50%, {{ $primaryColor }}11 0%, transparent 70%);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="bg-scene">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-    </div>
-
-    <div class="login-wrapper">
-        <div class="login-card">
-            <div class="login-brand">
-                <div class="logo">
-                    @if(isset($system_branding['logo_path']))
-                        <img src="{{ asset('storage/'.$system_branding['logo_path']) }}" alt="Logo" style="max-height: 48px; width: auto;">
+    <div class="login-page">
+        <!-- BRANDING SIDE -->
+        <div class="brand-section">
+            <div class="mesh-bg"></div>
+            <div class="brand-content">
+                <div class="brand-logo-frame">
+                    @if(isset($system_branding['system_logo']))
+                        <img src="{{ asset('storage/'.$system_branding['system_logo']) }}" alt="Logo">
                     @else
-                        <i class="{{ $system_branding['system_icon'] ?? 'fas fa-bolt' }}"></i>
+                        <i class="{{ $system_branding['system_icon'] ?? 'fas fa-rocket' }}"></i>
                     @endif
                 </div>
-                <h1>{{ $system_branding['app_name'] ?? 'Floor-in' }}</h1>
-                <p>{{ __('messages.login_subtitle') }}</p>
+                <h1>{{ $system_branding['system_name'] ?? 'OpenCRM' }}</h1>
+                <p class="slogan">{{ $system_branding['system_slogan'] ?? 'Elevate Your Business Workflow with Next-Generation Intelligence and Seamless Management.' }}</p>
             </div>
+        </div>
 
-            @if($errors->any())
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-circle"></i>
-                    @foreach($errors->all() as $error)
-                        <span>{{ $error }}</span>
-                    @endforeach
+        <!-- FORM SIDE -->
+        <div class="form-section">
+            <div class="login-card">
+                <div class="form-header">
+                    <h2>{{ __('messages.welcome_back') ?? 'Welcome Back' }}</h2>
+                    <p>{{ __('messages.please_enter_details') ?? 'Please enter your account details' }}</p>
                 </div>
-            @endif
 
-            <form method="POST" action="{{ route('login') }}">
-                @csrf
-                <div class="form-group">
-                    <label>{{ __('messages.username') }}</label>
-                    <div class="input-wrapper">
-                        <input type="text" name="username" value="{{ old('username') }}" placeholder="{{ __('messages.username') }}" required autofocus>
+                @if($errors->any())
+                    <div class="alert">
+                        <i class="fas fa-exclamation-circle"></i>
+                        @foreach($errors->all() as $error)
+                            <span>{{ $error }}</span>
+                        @endforeach
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('login') }}">
+                    @csrf
+                    <div class="form-group">
+                        <label>{{ __('messages.username') ?? 'Username' }}</label>
+                        <input type="text" name="username" class="input-control" value="{{ old('username') }}" required autofocus>
                         <i class="fas fa-user"></i>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label>{{ __('messages.password') }}</label>
-                    <div class="input-wrapper">
-                        <input type="password" name="password" placeholder="{{ __('messages.password') }}" required>
+                    <div class="form-group">
+                        <label>{{ __('messages.password') ?? 'Password' }}</label>
+                        <input type="password" name="password" class="input-control" required>
                         <i class="fas fa-lock"></i>
                     </div>
-                </div>
 
-                <div class="form-options">
-                    <label class="checkbox-wrapper">
-                        <input type="checkbox" name="remember">
-                        <span>{{ __('messages.remember_me') }}</span>
-                    </label>
-                </div>
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox" name="remember">
+                            <span>{{ __('messages.remember_me') ?? 'Remember me' }}</span>
+                        </label>
+                    </div>
 
-                <button type="submit" class="btn-login">
-                    <i class="fas fa-sign-in-alt"></i>
-                    {{ __('messages.sign_in') }}
-                </button>
-            </form>
-
-
+                    <button type="submit" class="btn-submit">
+                        {{ __('messages.sign_in') ?? 'Sign In' }}
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </body>

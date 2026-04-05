@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# 🛡️ Git Pre-commit Security Hook
+# This script scans staged files for sensitive data before allowing a commit.
+
+# Define blacklisted patterns
+SENSITIVE_IP="89.117.52.90"
+SENSITIVE_PASS="G4MQ8gItAgJS8vE4W0k9LmNUxsgIJ"
+
+# Colors for terminal output
+RED='\033[0;31m'
+NC='\033[0m'
+
+echo "🔍 Scanning files for sensitive data..."
+
+# Get a list of staged files (excluding deletions)
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=d)
+
+if [ -z "$STAGED_FILES" ]; then
+    exit 0
+fi
+
+FAILURE=0
+
+for file in $STAGED_FILES; do
+    # Skip the hook itself to avoid false positives
+    if [[ "$file" == "scripts/git-hooks/pre-commit" ]]; then
+        continue
+    fi
+
+    # 1. Check for sensitive IP
+    if grep -q "$SENSITIVE_IP" "$file"; then
+        echo -e "${RED}❌ ERROR: Found sensitive IP ($SENSITIVE_IP) in: $file${NC}"
+        FAILURE=1
+    fi
+
+    # 2. Check for sensitive Root Password
+    if grep -q "$SENSITIVE_PASS" "$file"; then
+        echo -e "${RED}❌ ERROR: Found sensitive password in: $file${NC}"
+        FAILURE=1
+    fi
+
+    # 3. Prevent committing raw deployment scripts (they should be ignored, but this is a double-check)
+    if [[ "$file" == "auto_deploy.sh" || "$file" == "server_deploy.sh" ]]; then
+        echo -e "${RED}❌ ERROR: DO NOT commit original deployment script ($file). USE .example instead.${NC}"
+        FAILURE=1
+    fi
+done
+
+if [ "$FAILURE" -eq 1 ]; then
+    echo -e "${RED}🛑 Commit blocked. Please remove the sensitive data or use placeholders.${NC}"
+    exit 1
+fi
+
+echo "✅ Security check passed. Proceeding with commit..."
+exit 0

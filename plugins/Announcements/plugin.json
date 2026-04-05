@@ -1,0 +1,7 @@
+{
+    "name": "Global Announcements",
+    "slug": "announcements",
+    "version": "1.0.0",
+    "description": "Post system-wide alerts and high-level notices with sleek glassmorphism and real-time visibility.",
+    "provider_class": "Plugins\\Announcements\\src\\AnnouncementServiceProvider"
+}

@@ -15,8 +15,9 @@ class SystemSettingsController extends Controller
         
         $dealStages = \App\Models\DealStage::orderBy('order')->get();
         $lossReasons = \App\Models\LossReason::orderBy('reason')->get();
+        $plugins = \App\Models\Plugin::all();
         
-        return view('settings.branding', compact('settings', 'activeTab', 'dealStages', 'lossReasons'));
+        return view('settings.branding', compact('settings', 'activeTab', 'dealStages', 'lossReasons', 'plugins'));
     }
 
     public function updateBranding(Request $request)
@@ -26,6 +27,9 @@ class SystemSettingsController extends Controller
             'system_icon' => 'nullable|string|max:100',
             'logo' => 'nullable|image|mimes:png,jpg,jpeg,svg|max:2048',
             'favicon' => 'nullable|image|mimes:png,jpg,jpeg,ico|max:1024',
+            'system_slogan' => 'nullable|string|max:500',
+            'primary_color' => 'nullable|string|regex:/^#[a-fA-F0-9]{6}$/',
+            'accent_color' => 'nullable|string|regex:/^#[a-fA-F0-9]{6}$/',
         ]);
 
         if ($request->has('app_name')) {
@@ -44,6 +48,18 @@ class SystemSettingsController extends Controller
         if ($request->hasFile('favicon')) {
             $path = $request->file('favicon')->store('branding', 'public');
             SystemSetting::set('system_favicon', $path);
+        }
+
+        if ($request->has('system_slogan')) {
+            SystemSetting::set('system_slogan', $request->system_slogan);
+        }
+
+        if ($request->has('primary_color')) {
+            SystemSetting::set('primary_color', $request->primary_color);
+        }
+
+        if ($request->has('accent_color')) {
+            SystemSetting::set('accent_color', $request->accent_color);
         }
 
         return back()->with('success', __('messages.settings_updated') ?? 'Branding updated successfully');

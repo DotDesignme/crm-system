@@ -11,9 +11,22 @@
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     @endif
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    
+    @php
+        $primaryColor = $system_branding['primary_color'] ?? '#1d4ed8';
+        $accentColor = $system_branding['accent_color'] ?? '#0ea5e9';
+    @endphp
+    <style>
+        :root {
+            --brand-blue: {{ $primaryColor }};
+            --brand-cyan: {{ $accentColor }};
+            --primary: {{ $primaryColor }};
+            --accent: {{ $accentColor }};
+        }
+    </style>
     <style>
         :root {
             --brand-navy: #050a15;
@@ -50,7 +63,6 @@
             --radius-sm: 14px;
             --radius-xs: 8px;
 
-            --font-ar: 'Tajawal', sans-serif;
             --font-en: 'Inter', sans-serif;
 
             --text-start: left;
@@ -322,6 +334,7 @@
             justify-content: space-between;
             padding: 0 32px;
         }
+
         .header-left {
             display: flex;
             align-items: center;
@@ -1590,6 +1603,7 @@
     <main class="main-content">
         <!-- HEADER -->
         <header class="header">
+            @stack('plugin-global-notice')
             <div class="header-left">
                 <button class="btn-mobile-menu" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
                 <div>
@@ -1636,5 +1650,6 @@
             document.getElementById('sidebarOverlay').classList.toggle('show');
         }
     </script>
+    @stack('plugin-scripts')
 </body>
 </html>
