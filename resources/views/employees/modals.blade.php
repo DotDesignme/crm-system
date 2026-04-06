@@ -48,13 +48,13 @@
                     {{ __('messages.transfer_data_instruction') ?? 'Before deleting, please select an employee to transfer all associated Leads, Deals, Tasks, and Customers to.' }}
                     <br>
                     <span style="font-weight:bold; margin-top:5px; display:block;">
-                        سيتم نقل جميع (Leads، Deals، Customers، Tasks، Notes) إلى الموظف المختار.
+                        All records (Leads, Deals, Customers, Tasks, Notes) will be transferred to the selected employee.
                     </span>
                 </div>
                 <div class="mb-3">
-                    <label class="gm-label">{{ __('messages.transfer_data_to') ?? 'نقل البيانات إلى' }}</label>
+                    <label class="gm-label">{{ __('messages.transfer_data_to') ?? 'Transfer Data To' }}</label>
                     <select name="transfer_to_id" id="transfer-to-id" class="gm-input" required>
-                        <option value="">{{ __('messages.select_employee') ?? 'اختر الموظف البديل' }}</option>
+                        <option value="">{{ __('messages.select_employee') ?? 'Select Replacement Employee' }}</option>
                         @foreach($employees as $emp)
                             <option value="{{ $emp->id }}">{{ $emp->name }}</option>
                         @endforeach
@@ -62,9 +62,9 @@
                 </div>
             </div>
             <div class="gm-footer">
-                <button type="button" class="filter-btn filter-btn-ghost" onclick="closeModal('deleteEmployeeModal')">{{ __('messages.cancel') ?? 'إلغاء' }}</button>
+                <button type="button" class="filter-btn filter-btn-ghost" onclick="closeModal('deleteEmployeeModal')">{{ __('messages.cancel') ?? 'Cancel' }}</button>
                 <button type="submit" class="filter-btn" style="background:var(--danger); color:white;">
-                    <i class="fas fa-exchange-alt"></i> {{ __('messages.transfer_and_delete') ?? 'نقل وحذف الموظف' }}
+                    <i class="fas fa-exchange-alt"></i> {{ __('messages.transfer_and_delete') ?? 'Transfer & Delete' }}
                 </button>
             </div>
         </form>
