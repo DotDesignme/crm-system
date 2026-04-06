@@ -7,8 +7,15 @@ use App\Models\Company;
 use App\Models\Deal;
 use App\Models\Role;
 use App\Models\SalesTarget;
+use App\Models\Lead;
+use App\Models\Task;
+use App\Models\Customer;
+use App\Models\Note;
+use App\Models\Quotation;
+use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class EmployeeController extends Controller
 {
@@ -133,14 +140,48 @@ class EmployeeController extends Controller
         return back()->with('success', __('messages.password_updated'));
     }
 
-    public function destroy(Employee $employee)
+    public function destroy(Request $request, Employee $employee)
     {
+        abort_if(!auth()->user()->is_admin, 403);
+
         if ($employee->is_admin) {
             return back()->withErrors(['error' => __('messages.cannot_delete_admin')]);
         }
 
-        $employee->update(['is_active' => false]);
-        return redirect()->route('employees.index')->with('success', __('messages.account_deactivated'));
+        $request->validate([
+            'transfer_to_id' => 'required|exists:employees,id|different:' . $employee->id,
+        ]);
+
+        $targetId = $request->transfer_to_id;
+
+        DB::transaction(function () use ($employee, $targetId) {
+            // Transfer Leads
+            Lead::where('added_by', $employee->id)->update(['added_by' => $targetId]);
+
+            // Transfer Deals
+            Deal::where('assigned_to', $employee->id)->update(['assigned_to' => $targetId]);
+
+            // Transfer Customers
+            Customer::where('assigned_to', $employee->id)->update(['assigned_to' => $targetId]);
+
+            // Transfer Tasks (both assigned and created)
+            Task::where('assigned_to', $employee->id)->update(['assigned_to' => $targetId]);
+            Task::where('created_by', $employee->id)->update(['created_by' => $targetId]);
+
+            // Transfer Notes
+            Note::where('employee_id', $employee->id)->update(['employee_id' => $targetId]);
+
+            // Transfer Quotations
+            Quotation::where('created_by', $employee->id)->update(['created_by' => $targetId]);
+
+            // Transfer Invoices
+            Invoice::where('created_by', $employee->id)->update(['created_by' => $targetId]);
+
+            // Soft Delete the employee
+            $employee->delete();
+        });
+
+        return redirect()->route('employees.index')->with('success', __('messages.employee_deleted_and_transferred') ?? 'Employee deleted and data transferred successfully.');
     }
 
     public function toggleStatus(Employee $employee)

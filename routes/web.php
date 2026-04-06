@@ -136,6 +136,7 @@ Route::middleware('auth')->group(function () {
         
         // Workflow / Duplicate Rules
         Route::post('/settings/workflow/update', [SystemSettingsController::class, 'updateWorkflow'])->name('settings.workflow.update');
+        Route::post('/settings/refresh-cache', [SystemSettingsController::class, 'refreshCache'])->name('settings.refresh-cache');
 
         // Executive Dashboard
         Route::get('/executive-dashboard', [AdminExecutiveController::class, 'index'])->name('admin.executive');

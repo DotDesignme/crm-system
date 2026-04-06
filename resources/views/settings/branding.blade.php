@@ -122,11 +122,19 @@
                             </div>
                         </div>
                     </div>
-                    <div style="margin-top:30px; text-align:right; border-top:1px solid rgba(255,255,255,.05); padding-top:20px;">
+                    <div style="margin-top:30px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,.05); padding-top:20px;">
+                        <div>
+                            <button type="button" class="filter-btn" style="background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); color:rgba(255,255,255,.7);" onclick="if(confirm('Refresh system cache to apply all branding changes?')) document.getElementById('refresh-cache-form').submit();">
+                                <i class="fas fa-sync-alt"></i> {{ __('messages.refresh_cache') ?? 'Refresh System Cache' }}
+                            </button>
+                        </div>
                         <button type="submit" class="filter-btn filter-btn-primary">
                             <i class="fas fa-save"></i> {{ __('messages.save_changes') }}
                         </button>
                     </div>
+                </form>
+                <form id="refresh-cache-form" action="{{ route('settings.refresh-cache') }}" method="POST" style="display:none;">
+                    @csrf
                 </form>
             </div>
         </div>

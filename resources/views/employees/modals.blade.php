@@ -30,6 +30,47 @@
     </div>
 </div>
 
+<!-- Delete Employee Modal -->
+<div class="gm-overlay" id="deleteEmployeeModal">
+    <div class="gm-box">
+        <div class="gm-header">
+            <div class="gm-title">
+                <i class="fas fa-trash" style="color:var(--danger);"></i>
+                {{ __('messages.delete_employee') ?? 'Delete Employee' }}: <span id="delete-emp-name" style="color:var(--danger); margin-left:6px;"></span>
+            </div>
+            <button class="gm-close" onclick="closeModal('deleteEmployeeModal')">&#215;</button>
+        </div>
+        <form id="deleteEmployeeForm" method="POST">
+            @csrf @method('DELETE')
+            <div class="gm-body">
+                <div class="alert alert-warning" style="background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.2); color:#ef4444; border-radius:10px; padding:12px; font-size:13px; margin-bottom:20px;">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    {{ __('messages.transfer_data_instruction') ?? 'Before deleting, please select an employee to transfer all associated Leads, Deals, Tasks, and Customers to.' }}
+                    <br>
+                    <span style="font-weight:bold; margin-top:5px; display:block;">
+                        سيتم نقل جميع (Leads، Deals، Customers، Tasks، Notes) إلى الموظف المختار.
+                    </span>
+                </div>
+                <div class="mb-3">
+                    <label class="gm-label">{{ __('messages.transfer_data_to') ?? 'نقل البيانات إلى' }}</label>
+                    <select name="transfer_to_id" id="transfer-to-id" class="gm-input" required>
+                        <option value="">{{ __('messages.select_employee') ?? 'اختر الموظف البديل' }}</option>
+                        @foreach($employees as $emp)
+                            <option value="{{ $emp->id }}">{{ $emp->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="gm-footer">
+                <button type="button" class="filter-btn filter-btn-ghost" onclick="closeModal('deleteEmployeeModal')">{{ __('messages.cancel') ?? 'إلغاء' }}</button>
+                <button type="submit" class="filter-btn" style="background:var(--danger); color:white;">
+                    <i class="fas fa-exchange-alt"></i> {{ __('messages.transfer_and_delete') ?? 'نقل وحذف الموظف' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Create/Edit Employee Modal -->
 <div class="gm-overlay" id="employeeModal">
     <div class="gm-box gm-box-lg">
@@ -231,6 +272,22 @@
         document.getElementById('target-amount').value = amount;
         document.getElementById('target-comm').value = comm;
         document.getElementById('targetModal').classList.add('show');
+    }
+
+    function openDeleteModal(id, name) {
+        document.getElementById('delete-emp-name').innerText = name;
+        document.getElementById('deleteEmployeeForm').action = "/employees/" + id;
+        
+        // Filter out the current employee from the dropdown
+        const select = document.getElementById('transfer-to-id');
+        Array.from(select.options).forEach(opt => {
+            opt.style.display = (opt.value == id) ? 'none' : 'block';
+            if (opt.value == id) opt.disabled = true;
+            else opt.disabled = false;
+        });
+        select.value = "";
+        
+        document.getElementById('deleteEmployeeModal').classList.add('show');
     }
 
     // Close on backdrop click

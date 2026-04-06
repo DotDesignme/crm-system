@@ -1,7 +1,0 @@
-{
-    "name": "Hello World Plugin",
-    "slug": "hello-world",
-    "version": "1.0.0",
-    "description": "A simple demonstration of the CRM plugin system.",
-    "provider_class": "Plugins\\HelloWorld\\src\\HelloServiceProvider"
-}

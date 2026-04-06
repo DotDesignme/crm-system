@@ -19,12 +19,34 @@
     @php
         $primaryColor = $system_branding['primary_color'] ?? '#1d4ed8';
         $accentColor = $system_branding['accent_color'] ?? '#0ea5e9';
+
+        // Helper to convert hex to rgb for rgba() support
+        if (!function_exists('hex2rgb')) {
+            function hex2rgb($hex) {
+                $hex = str_replace("#", "", $hex);
+                if(strlen($hex) == 3) {
+                    $r = hexdec(substr($hex,0,1).substr($hex,0,1));
+                    $g = hexdec(substr($hex,1,1).substr($hex,1,1));
+                    $b = hexdec(substr($hex,2,1).substr($hex,2,1));
+                } else {
+                    $r = hexdec(substr($hex,0,2));
+                    $g = hexdec(substr($hex,2,2));
+                    $b = hexdec(substr($hex,4,2));
+                }
+                return "$r, $g, $b";
+            }
+        }
+
+        $primaryRGB = hex2rgb($primaryColor);
+        $accentRGB = hex2rgb($accentColor);
     @endphp
 
     <style>
         :root {
             --primary: {{ $primaryColor }};
             --accent: {{ $accentColor }};
+            --primary-rgb: {{ $primaryRGB }};
+            --accent-rgb: {{ $accentRGB }};
             --bg-dark: #050a15;
             --glass-bg: rgba(15, 23, 42, 0.6);
             --glass-border: rgba(255, 255, 255, 0.08);
@@ -73,8 +95,8 @@
             top: -20%;
             left: -20%;
             background: 
-                radial-gradient(circle at 20% 30%, {{ $primaryColor }}33 0%, transparent 40%),
-                radial-gradient(circle at 80% 70%, {{ $accentColor }}22 0%, transparent 40%),
+                radial-gradient(circle at 20% 30%, rgba(var(--primary-rgb), 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(var(--accent-rgb), 0.15) 0%, transparent 40%),
                 radial-gradient(circle at 50% 50%, #1e1b4b 0%, transparent 60%);
             filter: blur(80px);
             animation: meshRotate 20s linear infinite;
@@ -114,7 +136,7 @@
         .brand-logo-frame img {
             max-height: 60px;
             max-width: 60px;
-            filter: drop-shadow(0 0 10px {{ $primaryColor }}66);
+            filter: drop-shadow(0 0 10px rgba(var(--primary-rgb), 0.4));
         }
         .brand-logo-frame i {
             font-size: 40px;

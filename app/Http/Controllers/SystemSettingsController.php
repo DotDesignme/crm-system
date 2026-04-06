@@ -5,9 +5,29 @@ namespace App\Http\Controllers;
 use App\Models\SystemSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 
 class SystemSettingsController extends Controller
 {
+    public function refreshCache()
+    {
+        try {
+            // Clear all application caches
+            Artisan::call('cache:clear');
+            Artisan::call('config:clear');
+            Artisan::call('route:clear');
+            Artisan::call('view:clear');
+            
+            // Specifically clear the branding/settings cache key if it exists
+            Cache::forget('all_system_settings');
+            
+            return back()->with('success', __('messages.cache_refreshed') ?? 'System cache refreshed successfully. All branding changes should now be visible.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to refresh cache: ' . $e->getMessage());
+        }
+    }
+
     public function index(Request $request)
     {
         $settings = SystemSetting::allCached();

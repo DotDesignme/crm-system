@@ -18,26 +18,44 @@
     @php
         $primaryColor = $system_branding['primary_color'] ?? '#1d4ed8';
         $accentColor = $system_branding['accent_color'] ?? '#0ea5e9';
+
+        // Helper to convert hex to rgb for rgba() support
+        if (!function_exists('hex2rgb')) {
+            function hex2rgb($hex) {
+                $hex = str_replace("#", "", $hex);
+                if(strlen($hex) == 3) {
+                    $r = hexdec(substr($hex,0,1).substr($hex,0,1));
+                    $g = hexdec(substr($hex,1,1).substr($hex,1,1));
+                    $b = hexdec(substr($hex,2,1).substr($hex,2,1));
+                } else {
+                    $r = hexdec(substr($hex,0,2));
+                    $g = hexdec(substr($hex,2,2));
+                    $b = hexdec(substr($hex,4,2));
+                }
+                return "$r, $g, $b";
+            }
+        }
+
+        $primaryRGB = hex2rgb($primaryColor);
+        $accentRGB = hex2rgb($accentColor);
     @endphp
     <style>
         :root {
-            --brand-blue: {{ $primaryColor }};
-            --brand-cyan: {{ $accentColor }};
+            /* User Dynamic Branding */
             --primary: {{ $primaryColor }};
             --accent: {{ $accentColor }};
-        }
-    </style>
-    <style>
-        :root {
+            --primary-rgb: {{ $primaryRGB }};
+            --accent-rgb: {{ $accentRGB }};
+            
+            --brand-blue: {{ $primaryColor }};
+            --brand-cyan: {{ $accentColor }};
+
+            /* Core Design System */
             --brand-navy: #050a15;
             --brand-navy-accent: #0f172a;
-            --brand-cyan: #0ea5e9;
-            --brand-blue: #1d4ed8;
 
-            --primary: var(--brand-blue);
             --primary-light: var(--brand-cyan);
             --primary-dark: #1e3a8a;
-            --accent: var(--brand-cyan);
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
@@ -93,7 +111,7 @@
             position: absolute;
             width: 800px;
             height: 800px;
-            background: radial-gradient(circle, rgba(29, 78, 216, 0.15) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(var(--primary-rgb), 0.15) 0%, transparent 70%);
             top: -200px;
             left: -200px;
             animation: float1 25s ease-in-out infinite;
@@ -105,7 +123,7 @@
             position: absolute;
             width: 700px;
             height: 700px;
-            background: radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(var(--accent-rgb), 0.1) 0%, transparent 70%);
             bottom: -150px;
             right: -150px;
             animation: float2 30s ease-in-out infinite;
@@ -115,7 +133,7 @@
             position: absolute;
             width: 600px;
             height: 600px;
-            background: radial-gradient(circle, rgba(30, 27, 75, 0.2) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(var(--primary-rgb), 0.08) 0%, transparent 70%);
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -155,14 +173,26 @@
         .sidebar-brand .logo {
             width: 44px;
             height: 44px;
-            background: linear-gradient(135deg, var(--brand-blue), var(--brand-cyan));
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 20px;
             color: white;
-            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+            overflow: hidden;
+        }
+        .sidebar-brand .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 4px;
+        }
+        .sidebar-brand .logo i {
+            background: linear-gradient(135deg, var(--brand-blue), var(--brand-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         .sidebar-brand .brand-text h1 {
             font-size: 20px;
@@ -223,15 +253,15 @@
         }
         .sidebar-nav a:hover i { opacity: 1; }
         .sidebar-nav a.active {
-            background: rgba(14, 165, 233, 0.12);
+            background: rgba(var(--accent-rgb), 0.12);
             color: var(--brand-cyan);
             font-weight: 700;
-            box-shadow: inset 0 0 15px rgba(14, 165, 233, 0.05);
+            box-shadow: inset 0 0 15px rgba(var(--accent-rgb), 0.05);
         }
         .sidebar-nav a.active i {
             opacity: 1;
             color: var(--brand-cyan);
-            filter: drop-shadow(0 0 5px rgba(14, 165, 233, 0.5));
+            filter: drop-shadow(0 0 5px rgba(var(--accent-rgb), 0.5));
         }
         .sidebar-nav a.active::before {
             content: '';
@@ -243,12 +273,12 @@
             height: 24px;
             background: linear-gradient(to bottom, var(--brand-blue), var(--brand-cyan));
             border-radius: 0 4px 4px 0;
-            box-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+            box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.5);
         }
         [dir="rtl"] .sidebar-nav a.active::before { left: auto; right: 0; border-radius: 4px 0 0 4px; }
         .sidebar-nav .nav-badge {
             margin-inline-start: 12px;
-            background: rgba(99, 102, 241, 0.2);
+            background: rgba(var(--primary-rgb), 0.2);
             color: var(--primary-light);
             font-size: 11px;
             font-weight: 600;
@@ -525,10 +555,10 @@
             font-size: 20px;
             margin-bottom: 16px;
         }
-        .stat-card:nth-child(1) .stat-icon { background: rgba(99, 102, 241, 0.15); color: var(--primary-light); }
+        .stat-card:nth-child(1) .stat-icon { background: rgba(var(--primary-rgb), 0.15); color: var(--primary-light); }
         .stat-card:nth-child(2) .stat-icon { background: rgba(16, 185, 129, 0.15); color: var(--success); }
         .stat-card:nth-child(3) .stat-icon { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
-        .stat-card:nth-child(4) .stat-icon { background: rgba(6, 182, 212, 0.15); color: var(--accent); }
+        .stat-card:nth-child(4) .stat-icon { background: rgba(var(--accent-rgb), 0.15); color: var(--accent); }
         .stat-card .stat-value {
             font-size: 32px;
             font-weight: 800;
@@ -571,11 +601,11 @@
         .btn-primary {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.3);
         }
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 6px 20px rgba(var(--primary-rgb), 0.4);
         }
         .btn-ghost {
             background: var(--glass-bg);
@@ -1474,18 +1504,16 @@
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 40px; padding: 0 8px;">
-                <div class="logo-container" style="width: 45px; height: 45px; border-radius: 14px; background: linear-gradient(135deg, var(--brand-blue), var(--brand-cyan)); display: flex; align-items: center; justify-content: center; box-shadow: var(--neon-glow); overflow: hidden;">
-                    @if(isset($system_branding['system_logo']))
-                        <img src="{{ asset('storage/'.$system_branding['system_logo']) }}" style="width: 100%; height: 100%; object-fit: cover;">
-                    @else
-                        <i class="{{ $system_branding['system_icon'] ?? 'fas fa-layer-group' }}" style="font-size: 20px; color: #fff;"></i>
-                    @endif
-                </div>
-                <div class="sidebar-header-text">
-                    <h1 style="font-size: 18px; font-weight: 800; color: #fff; margin: 0; letter-spacing: -0.5px;">{{ $system_branding['system_name'] ?? config('app.name') }}</h1>
-                    <div style="font-size: 10px; color: var(--brand-cyan); font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Growth OS</div>
-                </div>
+            <div class="logo">
+                @if(isset($system_branding['system_logo']))
+                    <img src="{{ asset('storage/'.$system_branding['system_logo']) }}" alt="Logo">
+                @else
+                    <i class="{{ $system_branding['system_icon'] ?? 'fas fa-layer-group' }}"></i>
+                @endif
+            </div>
+            <div class="brand-text">
+                <h1>{{ $system_branding['system_name'] ?? config('app.name') }}</h1>
+                <span>{{ $system_branding['system_slogan'] ?? 'PLATFORM' }}</span>
             </div>
         </div>
 

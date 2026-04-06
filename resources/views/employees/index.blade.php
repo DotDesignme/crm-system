@@ -96,6 +96,9 @@
                         <button class="g-btn-icon g-btn-icon-edit" onclick='editEmployee(@json($emp))'><i class="fas fa-pen"></i></button>
                         <button class="g-btn-icon g-btn-icon-view" style="color:#fbbf24;" onclick='openResetPasswordModal({{ $emp->id }}, "{{ addslashes($emp->name) }}")'><i class="fas fa-key"></i></button>
                         <a href="{{ route('employees.activity-log', $emp) }}" class="g-btn-icon g-btn-icon-view"><i class="fas fa-history"></i></a>
+                        @if(auth()->user()->is_admin)
+                            <button class="g-btn-icon g-btn-icon-delete" onclick='openDeleteModal({{ $emp->id }}, "{{ addslashes($emp->name) }}")'><i class="fas fa-trash"></i></button>
+                        @endif
                     </div>
 
                     <div style="margin-top:20px; text-align:left;">
@@ -184,6 +187,9 @@
                                     <button class="g-btn-icon g-btn-icon-edit" onclick='editEmployee(@json($emp))'><i class="fas fa-pen"></i></button>
                                     <button class="g-btn-icon g-btn-icon-view" style="color:#fbbf24;" onclick='openResetPasswordModal({{ $emp->id }}, "{{ addslashes($emp->name) }}")'><i class="fas fa-key"></i></button>
                                     <a href="{{ route('employees.activity-log', $emp) }}" class="g-btn-icon g-btn-icon-view"><i class="fas fa-history"></i></a>
+                                    @if(auth()->user()->is_admin)
+                                        <button class="g-btn-icon g-btn-icon-delete" onclick='openDeleteModal({{ $emp->id }}, "{{ addslashes($emp->name) }}")'><i class="fas fa-trash"></i></button>
+                                    @endif
                                     <form action="{{ route('employees.toggle-status', $emp) }}" method="POST" style="margin:0;">
                                         @csrf
                                         <button type="submit" class="g-btn-icon {{ $emp->is_active ? 'g-btn-icon-delete' : 'g-btn-icon-view' }}" style="{{ $emp->is_active ? '' : 'color:var(--success);' }}">
