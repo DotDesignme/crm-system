@@ -131,6 +131,16 @@
                                 <i class="fas fa-pen"></i>
                             </a>
                             @endcan
+                            @can('delete-leads')
+                            @if(Auth::user()->is_admin || $lead->added_by === Auth::id())
+                            <form action="{{ route('leads.destroy', $lead) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('{{ __('messages.confirm_delete') }}')">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="g-btn-icon g-btn-icon-delete" title="{{ __('messages.delete') }}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                            @endif
+                            @endcan
                         </div>
                     </td>
                 </tr>

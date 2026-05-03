@@ -11,23 +11,8 @@ class RolePermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        $permissions = [
-            'leads' => ['view-any-lead', 'view-own-lead', 'create-lead', 'edit-lead', 'delete-lead'],
-            'deals' => ['view-any-deal', 'view-own-deal', 'create-deal', 'edit-deal', 'delete-deal'],
-            'companies' => ['view-any-company', 'create-company', 'edit-company', 'delete-company'],
-            'services' => ['view-services', 'manage-services'],
-            'tasks' => ['view-any-task', 'view-own-task', 'create-task', 'edit-task', 'delete-task'],
-            'settings' => ['manage-employees', 'manage-roles', 'view-reports'],
-        ];
-
-        foreach ($permissions as $group => $slugs) {
-            foreach ($slugs as $slug) {
-                Permission::firstOrCreate(['slug' => $slug], [
-                    'name' => ucwords(str_replace('-', ' ', $slug)),
-                    'group' => $group
-                ]);
-            }
-        }
+        // Re-use PermissionsSeeder logic to ensure all permissions exist
+        $this->call(PermissionsSeeder::class);
 
         // --- Create Roles ---
         
@@ -43,9 +28,7 @@ class RolePermissionSeeder extends Seeder
             'name' => 'Manager',
             'description' => 'Manage teams, view reports, and handle high-level CRM records'
         ]);
-        $managerPermissions = Permission::whereIn('group', ['leads', 'deals', 'companies', 'services', 'tasks'])
-            ->orWhere('slug', 'view-reports')
-            ->get();
+        $managerPermissions = Permission::whereIn('group', ['leads', 'deals', 'customers', 'companies', 'tasks', 'services', 'reports'])->get();
         $manager->permissions()->sync($managerPermissions);
 
         // Sales Agent
@@ -54,11 +37,11 @@ class RolePermissionSeeder extends Seeder
             'description' => 'Individual contributor, manages own leads and deals'
         ]);
         $agentPermissions = Permission::whereIn('slug', [
-            'view-own-lead', 'create-lead', 'edit-lead',
-            'view-own-deal', 'create-deal', 'edit-deal',
-            'create-company', 'view-any-company',
+            'view-leads', 'create-leads', 'edit-leads',
+            'view-deals', 'create-deals', 'edit-deals',
+            'create-customers', 'view-customers',
             'view-services',
-            'view-own-task', 'create-task', 'edit-task'
+            'view-tasks', 'create-tasks', 'edit-tasks'
         ])->get();
         $agent->permissions()->sync($agentPermissions);
 

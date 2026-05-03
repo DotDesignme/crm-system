@@ -51,7 +51,11 @@
                     <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                         @foreach($perms as $perm)
                         @php
-                            $action = explode('_', $perm->name)[0];
+                            $action = explode('-', $perm->slug)[0];
+                            if ($action === $perm->slug && str_contains($perm->slug, '_')) {
+                                $action = explode('_', $perm->slug)[0];
+                            }
+                            
                             $isArabic = app()->getLocale() == 'ar';
                             $map = [
                                 'view' => $isArabic ? 'عرض' : 'View',

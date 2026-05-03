@@ -25,6 +25,16 @@
             <i class="fas fa-pen" style="margin-{{ app()->getLocale() == 'ar' ? 'left' : 'right' }}: 8px;"></i> {{ __('messages.edit') }}
         </a>
         @endcan
+        @can('delete-leads')
+        @if(Auth::user()->is_admin || $lead->added_by === Auth::id())
+        <form action="{{ route('leads.destroy', $lead) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('{{ __('messages.confirm_delete') }}')">
+            @csrf @method('DELETE')
+            <button type="submit" class="btn btn-danger" style="padding: 12px 24px; background: var(--danger); border: none;">
+                <i class="fas fa-trash" style="margin-{{ app()->getLocale() == 'ar' ? 'left' : 'right' }}: 8px;"></i> {{ __('messages.delete') }}
+            </button>
+        </form>
+        @endif
+        @endcan
         <a href="{{ route('leads.index') }}" class="btn btn-ghost" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);">
             <i class="fas fa-arrow-{{ app()->getLocale() == 'ar' ? 'right' : 'left' }}" style="margin-{{ app()->getLocale() == 'ar' ? 'left' : 'right' }}: 8px;"></i> {{ __('messages.back') }}
         </a>

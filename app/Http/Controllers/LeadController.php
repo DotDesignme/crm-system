@@ -227,6 +227,20 @@ class LeadController extends Controller
             abort(403);
         }
 
+        // Clean up related polymorphic records
+        $lead->tasks()->delete();
+        $lead->activities()->delete();
+        $lead->notes()->delete();
+        $lead->communications()->delete();
+        
+        // Handle physical files
+        foreach($lead->attachments as $attachment) {
+            if ($attachment->path) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($attachment->path);
+            }
+            $attachment->delete();
+        }
+
         $lead->delete();
 
         return redirect()->route('leads.index')->with('success', __('messages.lead_deleted'));
