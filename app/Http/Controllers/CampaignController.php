@@ -56,6 +56,12 @@ class CampaignController extends Controller
         $validated['company_id'] = $user->company_id;
         $validated['employee_id'] = $user->id;
 
+        // Ensure numeric fields are not null for SQLite
+        $validated['reach'] = $validated['reach'] ?? 0;
+        $validated['impressions'] = $validated['impressions'] ?? 0;
+        $validated['clicks'] = $validated['clicks'] ?? 0;
+        $validated['conversions'] = $validated['conversions'] ?? 0;
+
         Campaign::create($validated);
         return redirect()->route('campaigns.index')->with('success', __('messages.campaign_added'));
     }
@@ -65,19 +71,20 @@ class CampaignController extends Controller
         $campaign->load(['company', 'employee']);
         
         $leads = $campaign->leads()->latest()->get();
-        $wonDeals = $campaign->deals()->whereHas('stage', function($q) {
+        $deals = $campaign->deals()->whereHas('stage', function($q) {
             $q->where('is_won', true);
         })->latest()->get();
 
         // Funnel Data
-        $funnel = [
-            'total' => $campaign->leads()->count(),
-            'contacted' => $campaign->leads()->whereIn('status', ['contacted', 'interested', 'converted'])->count(),
+        $funnelData = [
+            'leads' => $campaign->leads()->count(),
+            'qualified' => $campaign->leads()->where('status', '!=', 'new')->count(),
             'interested' => $campaign->leads()->whereIn('status', ['interested', 'converted'])->count(),
-            'won' => $wonDeals->count()
+            'converted' => $campaign->leads()->where('status', 'converted')->count(),
+            'won' => $deals->count()
         ];
 
-        return view('campaigns.show', compact('campaign', 'leads', 'wonDeals', 'funnel'));
+        return view('campaigns.show', compact('campaign', 'leads', 'deals', 'funnelData'));
     }
 
     public function edit(Campaign $campaign)
@@ -107,6 +114,12 @@ class CampaignController extends Controller
             'clicks' => 'nullable|integer|min:0',
             'conversions' => 'nullable|integer|min:0',
         ]);
+
+        // Ensure numeric fields are not null for SQLite
+        $validated['reach'] = $validated['reach'] ?? 0;
+        $validated['impressions'] = $validated['impressions'] ?? 0;
+        $validated['clicks'] = $validated['clicks'] ?? 0;
+        $validated['conversions'] = $validated['conversions'] ?? 0;
 
         $campaign->update($validated);
         return redirect()->route('campaigns.index')->with('success', __('messages.campaign_updated'));
